@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yayasan Peduli Umat</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2c5282;
+            --secondary-color: #4299e1;
+            --accent-color: #ed8936;
+            --light-bg: #f7fafc;
+            --dark-text: #2d3748;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+
+        /* Floating WhatsApp Button */
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 40px;
+            right: 40px;
+            background-color: #25d366;
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .whatsapp-float:hover {
+            background-color: #128C7E;
+            transform: scale(1.1);
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--primary-color) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 500;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            color: var(--accent-color) !important;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,133.3C960,128,1056,96,1152,90.7C1248,85,1344,107,1392,117.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background-size: cover;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        /* Card Styles */
+        .custom-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .custom-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        /* Media Section */
+        .media-container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .media-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        /* Login Form */
+        .login-container {
+            max-width: 500px;
+            margin: 100px auto;
+            background-color: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 40px 0;
+            margin-top: 80px;
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/6287755430203?text=Halo%20pak%20saya%20[nama]%20dari%20[daerah]%20ingin%20bertanya.." class="whatsapp-float" target="_blank">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
+    <!-- Login Section (Hidden by default) -->
+    <div id="loginSection" class="container">
+        <div class="login-container fade-in">
+            <h2 class="login-title">Masuk ke Yayasan</h2>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="nama" class="form-label">Nama Lengkap</label>
+                    <input type="text" class="form-control" id="nama" placeholder="Masukkan nama lengkap" required>
+                </div>
+                <div class="mb-4">
+                    <label for="daerah" class="form-label">Asal Daerah</label>
+                    <input type="text" class="form-control" id="daerah" placeholder="Masukkan asal daerah" required>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Masuk</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content (Hidden by default) -->
+    <div id="mainContent" style="display: none;">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#"><i class="bi bi-heart-fill me-2"></i>Yayasan Peduli Umat</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-page="home">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-page="product">Produk Yayasan</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-page="media">Media</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="logoutBtn">Keluar</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Home Page -->
+        <div id="homePage" class="page-content">
+            <section class="hero-section">
+                <div class="container hero-content">
+                    <h1 class="hero-title fade-in">Yayasan Peduli Umat</h1>
+                    <p class="hero-subtitle fade-in">Membangun masa depan yang lebih cerah melalui pendidikan, kesehatan, dan pemberdayaan masyarakat</p>
+                </div>
+            </section>
+
+            <div class="container my-5">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <div class="custom-card fade-in">
+                            <div class="card-body">
+                                <h2 class="section-title">Tentang Kami</h2>
+                                <p class="lead">Yayasan Peduli Umat adalah organisasi nirlaba yang berdedikasi untuk meningkatkan kualitas hidup masyarakat Indonesia melalui berbagai program sosial dan pemberdayaan.</p>
+                                
+                                <h4 class="mt-4 mb-3">Visi Kami</h4>
+                                <p>Menjadi yayasan terdepan dalam menciptakan masyarakat yang mandiri, sejahtera, dan berdaya melalui pendidikan berkualitas dan kesehatan yang merata.</p>
+                                
+                                <h4 class="mt-4 mb-3">Misi Kami</h4>
+                                <ul>
+                                    <li>Memberikan beasiswa pendidikan bagi anak-anak kurang mampu</li>
+                                    <li>Menyediakan layanan kesehatan dasar di daerah terpencil</li>
+                                    <li>Membangun infrastruktur pendukung masyarakat</li>
+                                    <li>Mengembangkan program pemberdayaan ekonomi</li>
+                                    <li>Menyebarkan nilai-nilai kemanusiaan dan kebersamaan</li>
+                                </ul>
+                                
+                                <h4 class="mt-4 mb-3">Sejarah Singkat</h4>
+                                <p>Didirikan pada tahun 2010 oleh sekelompok relawan yang peduli terhadap kondisi masyarakat di daerah pedesaan. Hingga kini, kami telah membantu lebih dari 10.000 penerima manfaat di seluruh Indonesia.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Page -->
+        <div id="productPage" class="page-content" style="display: none;">
+            <div class="container my-5">
+                <h2 class="section-title text-center mb-5">Produk Yayasan</h2>
+                
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="custom-card fade-in">
+                            <img src="https://picsum.photos/seed/product1/400/300.jpg" class="card-img-top" alt="Produk 1">
+                            <div class="card-body">
+                                <h5 class="card-title">Program Beasiswa</h5>
+                                <p class="card-text">Membantu anak-anak kurang mampu untuk mendapatkan pendidikan yang layak hingga jenjang perguruan tinggi.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-3">
+                        <div class="custom-card fade-in">
+                            <img src="https://picsum.photos/seed/product2/400/300.jpg" class="card-img-top" alt="Produk 2">
+                            <div class="card-body">
+                                <h5 class="card-title">Kesehatan Gratis</h5>
+                                <p class="card-text">Layanan kesehatan dasar dan pengobatan gratis untuk masyarakat di daerah terpencil.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-3">
+                        <div class="custom-card fade-in">
+                            <img src="https://picsum.photos/seed/product3/400/300.jpg" class="card-img-top" alt="Produk 3">
+                            <div class="card-body">
+                                <h5 class="card-title">Pemberdayaan Ekonomi</h5>
+                                <p class="card-text">Pelatihan kewirausahaan dan modal usaha untuk ibu rumah tangga dan pemuda.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-3">
+                        <div class="custom-card fade-in">
+                            <img src="https://picsum.photos/seed/product4/400/300.jpg" class="card-img-top" alt="Produk 4">
+                            <div class="card-body">
+                                <h5 class="card-title">Pembangunan Masjid</h5>
+                                <p class="card-text">Program pembangunan dan renovasi sarana ibadah di daerah yang membutuhkan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Media Page -->
+        <div id="mediaPage" class="page-content" style="display: none;">
+            <div class="container my-5">
+                <h2 class="section-title text-center mb-5">Media Kami</h2>
+                
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="media-container fade-in">
+                            <h3 class="media-title"><i class="bi bi-youtube me-2"></i>Video Terbaru</h3>
+                            <div class="ratio ratio-16x9">
+                                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video" allowfullscreen></iframe>
+                            </div>
+                            <p class="mt-3">Kegiatan penyaluran beasiswa di pelosok Jawa Barat</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6 mb-4">
+                        <div class="media-container fade-in">
+                            <h3 class="media-title"><i class="bi bi-instagram me-2"></i>Instagram Feed</h3>
+                            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/Cj4oLX2B4Xs/" data-instgrm-version="14" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:540px; min-width:326px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);">
+                                <div style="padding:16px;"> 
+                                    <a href="https://www.instagram.com/p/Cj4oLX2B4Xs/" style=" background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank">
+                                        <div style=" display: flex; flex-direction: row; align-items: center;">
+                                            <div style="background-color: #F4F4F4; border-radius: 50%; flex-grow: 0; height: 40px; margin-right: 14px; width: 40px;"></div>
+                                            <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: center;">
+                                                <div style=" background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; margin-bottom: 6px; width: 100px;"></div>
+                                                <div style=" background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; width: 60px;"></div>
+                                            </div>
+                                        </div>
+                                        <div style="padding: 19% 0;"></div>
+                                        <div style="display:block; height:50px; margin:0 auto 12px; width:50px;">
+                                            <svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink">
+                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                    <g transform="translate(-511.000000, -20.000000)" fill="#000000">
+                                                        <g>
+                                                            <path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.994,74.552 541,74.552 C533.006,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.652 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path>
+                                                        </g>
+                                                    </g>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <div style="padding-top: 8px;">
+                                            <div style=" color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;">Lihat postingan ini di Instagram</div>
+                                        </div>
+                                        <div style="padding: 12.5% 0;"></div>
+                                        <div style="display: flex; flex-direction: row; margin-bottom: 14px; align-items: center;">
+                                            <div>
+                                                <div style="background-color: #F4F4F4; border-radius: 50%; height: 12.5px; width: 12.5px; transform: translateX(0px) translateY(7px);"></div>
+                                                <div style="background-color: #F4F4F4; height: 12.5px; transform: rotate(-45deg) translateX(3px) translateY(1px); width: 12.5px; flex-grow: 0; margin-right: 14px; margin-left: 2px;"></div>
+                                                <div style="background-color: #F4F4F4; border-radius: 50%; height: 12.5px; width: 12.5px; transform: translateX(9px) translateY(-18px);"></div>
+                                            </div>
+                                            <div style="margin-left: 8px;">
+                                                <div style=" background-color: #F4F4F4; border-radius: 50%; flex-grow: 0; height: 20px; width: 20px;"></div>
+                                                <div style=" width: 0; height: 0; border-top: 2px solid transparent; border-left: 6px solid #f4f4f4; border-bottom: 2px solid transparent; transform: translateX(16px) translateY(-4px) rotate(30deg)"></div>
+                                            </div>
+                                            <div style="margin-left: auto;">
+                                                <div style=" width: 0px; border-top: 8px solid #F4F4F4; border-right: 8px solid transparent; transform: translateY(16px);"></div>
+                                                <div style=" background-color: #F4F4F4; flex-grow: 0; height: 12px; width: 16px; transform: translateY(-4px);"></div>
+                                                <div style=" width: 0; height: 0; border-top: 8px solid #F4F4F4; border-left: 8px solid transparent; transform: translateY(-4px) translateX(8px);"></div>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: center; margin-bottom: 24px;">
+                                            <div style=" background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; margin-bottom: 6px; width: 224px;"></div>
+                                            <div style=" background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; width: 224px;"></div>
+                                        </div>
+                                    </a>
+                                    <p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;">
+                                        <a href="https://www.instagram.com/p/Cj4oLX2B4Xs/" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">Sebuah postingan yang dibagikan oleh Yayasan Peduli Umat (@yayasanpeduli)</a>
+                                    </p>
+                                </div>
+                            </blockquote>
+                            <script async src="//www.instagram.com/embed.js"></script>
+                            <p class="mt-3">Kegiatan pembagian sembako untuk warga terdampak pandemi</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <h5 class="footer-title">Yayasan Peduli Umat</h5>
+                        <p>Jl. Kebajikan No. 123, Jakarta Selatan</p>
+                        <p>Telepon: (021) 1234-5678</p>
+                        <p>Email: info@yayasanpeduli.or.id</p>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <h5 class="footer-title">Tautan Cepat</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-white-50 text-decoration-none">Tentang Kami</a></li>
+                            <li><a href="#" class="text-white-50 text-decoration-none">Program</a></li>
+                            <li><a href="#" class="text-white-50 text-decoration-none">Donasi</a></li>
+                            <li><a href="#" class="text-white-50 text-decoration-none">Relawan</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <h5 class="footer-title">Ikuti Kami</h5>
+                        <div class="d-flex gap-3">
+                            <a href="#" class="text-white fs-4"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="text-white fs-4"><i class="bi bi-twitter"></i></a>
+                            <a href="#" class="text-white fs-4"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="text-white fs-4"><i class="bi bi-youtube"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-4 bg-white">
+                <div class="text-center">
+                    <p class="mb-0">&copy; 2023 Yayasan Peduli Umat. Hak Cipta Dilindungi.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const loginSection = document.getElementById('loginSection');
+            const mainContent = document.getElementById('mainContent');
+            
+            if (isLoggedIn === 'true') {
+                loginSection.style.display = 'none';
+                mainContent.style.display = 'block';
+                showPage('home');
+            } else {
+                loginSection.style.display = 'block';
+                mainContent.style.display = 'none';
+            }
+        });
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nama = document.getElementById('nama').value;
+            const daerah = document.getElementById('daerah').value;
+            
+            if (nama && daerah) {
+                // Save user data
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userName', nama);
+                localStorage.setItem('userRegion', daerah);
+                
+                // Update WhatsApp link with user data
+                const whatsappLink = document.querySelector('.whatsapp-float');
+                const message = `Halo pak saya ${nama} dari ${daerah} ingin bertanya..`;
+                whatsappLink.href = `https://wa.me/6287755430203?text=${encodeURIComponent(message)}`;
+                
+                // Show main content
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                showPage('home');
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRegion');
+            
+            // Reset WhatsApp link
+            const whatsappLink = document.querySelector('.whatsapp-float');
+            whatsappLink.href = 'https://wa.me/6287755430203?text=Halo%20pak%20saya%20[nama]%20dari%20[daerah]%20ingin%20bertanya..';
+            
+            // Show login form
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'none';
+        });
+
+        // Page navigation
+        function showPage(pageName) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Show selected page
+            document.getElementById(pageName + 'Page').style.display = 'block';
+            
+            // Update active nav link
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-page') === pageName) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Add click event to nav links
+        document.querySelectorAll('.nav-link[data-page]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = this.getAttribute('data-page');
+                showPage(page);
+            });
+        });
+
+        // Add fade-in animation to elements when they come into view
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all elements with fade-in class
+        document.querySelectorAll('.custom-card, .media-container').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
