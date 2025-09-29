@@ -3,22 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yayasan Peduli Umat</title>
+    <title>Yayasan Yasamu</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         :root {
-            --primary-color: #2c5282;
-            --secondary-color: #4299e1;
-            --accent-color: #ed8936;
+            /* Warna dari logo Yasamu */
+            --primary-color: #2c8c3c; /* Hijau dari pola manusia */
+            --secondary-color: #4caf50; /* Hijau muda */
+            --accent-color: #FFD700; /* Emas dari bintang */
+            --accent-red: #e53935; /* Merah dari teks INDONESIA */
+            --dark-text: #333333; /* Hitam dari teks YASAMU */
             --light-bg: #f7fafc;
-            --dark-text: #2d3748;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--light-bg);
             color: var(--dark-text);
+        }
+
+        /* Logo Styles */
+        .logo {
+            height: 40px;
+            width: 40px;
+            margin-right: 10px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+
+        .logo-large {
+            height: 120px;
+            width: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         /* Floating WhatsApp Button */
@@ -28,7 +49,7 @@
             height: 60px;
             bottom: 40px;
             right: 40px;
-            background-color: #25d366;
+            background-color: var(--primary-color);
             color: #FFF;
             border-radius: 50px;
             text-align: center;
@@ -42,7 +63,7 @@
         }
 
         .whatsapp-float:hover {
-            background-color: #128C7E;
+            background-color: var(--secondary-color);
             transform: scale(1.1);
         }
 
@@ -55,6 +76,8 @@
         .navbar-brand {
             font-weight: 700;
             font-size: 1.5rem;
+            display: flex;
+            align-items: center;
         }
 
         .nav-link {
@@ -209,7 +232,7 @@
 
         .form-control:focus {
             border-color: var(--secondary-color);
-            box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25);
+            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
         }
 
         .btn-primary {
@@ -283,7 +306,10 @@
     <!-- Login Section (Hidden by default) -->
     <div id="loginSection" class="container">
         <div class="login-container fade-in">
-            <h2 class="login-title">Masuk ke Yayasan</h2>
+            <div class="text-center mb-4">
+                <img src="https://z-cdn-media.chatglm.cn/files/271463af-2f11-4678-bd4f-68e56a8722ea_WhatsApp%20Image%202025-09-29%20at%2018.09.19_8dd8e276.jpg?auth_key=1790681919-339bcd4fa2a1418dacf4018ccdef01fe-0-3a49bc8c86d0efa3861aa796dd88f3e3" alt="Logo Yasamu" class="logo-large">
+            </div>
+            <h2 class="login-title">Masuk ke Yasamu</h2>
             <form id="loginForm">
                 <div class="mb-3">
                     <label for="nama" class="form-label">Nama Lengkap</label>
@@ -305,7 +331,10 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container">
-                <a class="navbar-brand" href="#"><i class="bi bi-heart-fill me-2"></i>Yayasan Peduli Umat</a>
+                <a class="navbar-brand" href="#">
+                    <img src="https://z-cdn-media.chatglm.cn/files/271463af-2f11-4678-bd4f-68e56a8722ea_WhatsApp%20Image%202025-09-29%20at%2018.09.19_8dd8e276.jpg?auth_key=1790681919-339bcd4fa2a1418dacf4018ccdef01fe-0-3a49bc8c86d0efa3861aa796dd88f3e3" alt="Logo Yasamu" class="logo">
+                    Yasamu
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -332,7 +361,10 @@
         <div id="homePage" class="page-content">
             <section class="hero-section">
                 <div class="container hero-content">
-                    <h1 class="hero-title fade-in">Yayasan Peduli Umat</h1>
+                    <div class="mb-4">
+                        <img src="https://z-cdn-media.chatglm.cn/files/271463af-2f11-4678-bd4f-68e56a8722ea_WhatsApp%20Image%202025-09-29%20at%2018.09.19_8dd8e276.jpg?auth_key=1790681919-339bcd4fa2a1418dacf4018ccdef01fe-0-3a49bc8c86d0efa3861aa796dd88f3e3" alt="Logo Yasamu" class="logo-large">
+                    </div>
+                    <h1 class="hero-title fade-in">Yasamu</h1>
                     <p class="hero-subtitle fade-in">Membangun masa depan yang lebih cerah melalui pendidikan, kesehatan, dan pemberdayaan masyarakat</p>
                 </div>
             </section>
@@ -343,7 +375,7 @@
                         <div class="custom-card fade-in">
                             <div class="card-body">
                                 <h2 class="section-title">Tentang Kami</h2>
-                                <p class="lead">Yayasan Peduli Umat adalah organisasi nirlaba yang berdedikasi untuk meningkatkan kualitas hidup masyarakat Indonesia melalui berbagai program sosial dan pemberdayaan.</p>
+                                <p class="lead">Yasamu adalah organisasi nirlaba yang berdedikasi untuk meningkatkan kualitas hidup masyarakat Indonesia melalui berbagai program sosial dan pemberdayaan.</p>
                                 
                                 <h4 class="mt-4 mb-3">Visi Kami</h4>
                                 <p>Menjadi yayasan terdepan dalam menciptakan masyarakat yang mandiri, sejahtera, dan berdaya melalui pendidikan berkualitas dan kesehatan yang merata.</p>
@@ -482,7 +514,7 @@
                                         </div>
                                     </a>
                                     <p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;">
-                                        <a href="https://www.instagram.com/p/Cj4oLX2B4Xs/" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">Sebuah postingan yang dibagikan oleh Yayasan Peduli Umat (@yayasanpeduli)</a>
+                                        <a href="https://www.instagram.com/p/Cj4oLX2B4Xs/" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">Sebuah postingan yang dibagikan oleh Yasamu (@yayasanpeduli)</a>
                                     </p>
                                 </div>
                             </blockquote>
@@ -499,7 +531,10 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-4 mb-4">
-                        <h5 class="footer-title">Yayasan Peduli Umat</h5>
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="https://z-cdn-media.chatglm.cn/files/271463af-2f11-4678-bd4f-68e56a8722ea_WhatsApp%20Image%202025-09-29%20at%2018.09.19_8dd8e276.jpg?auth_key=1790681919-339bcd4fa2a1418dacf4018ccdef01fe-0-3a49bc8c86d0efa3861aa796dd88f3e3" alt="Logo Yasamu" class="logo me-2">
+                            <h5 class="footer-title mb-0">Yasamu</h5>
+                        </div>
                         <p>Jl. Kebajikan No. 123, Jakarta Selatan</p>
                         <p>Telepon: (021) 1234-5678</p>
                         <p>Email: info@yayasanpeduli.or.id</p>
@@ -525,7 +560,7 @@
                 </div>
                 <hr class="my-4 bg-white">
                 <div class="text-center">
-                    <p class="mb-0">&copy; 2023 Yayasan Peduli Umat. Hak Cipta Dilindungi.</p>
+                    <p class="mb-0">&copy; 2023 Yasamu. Hak Cipta Dilindungi.</p>
                 </div>
             </div>
         </footer>
@@ -535,6 +570,10 @@
     <script>
         // Check if user is logged in
         document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+        });
+
+        function checkLoginStatus() {
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const loginSection = document.getElementById('loginSection');
             const mainContent = document.getElementById('mainContent');
@@ -547,7 +586,7 @@
                 loginSection.style.display = 'block';
                 mainContent.style.display = 'none';
             }
-        });
+        }
 
         // Login form submission
         document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -571,6 +610,11 @@
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
                 showPage('home');
+                
+                // Optional: Show success message
+                alert('Login berhasil! Selamat datang di Yasamu.');
+            } else {
+                alert('Silakan isi semua field dengan benar.');
             }
         });
 
@@ -588,6 +632,9 @@
             // Show login form
             document.getElementById('loginSection').style.display = 'block';
             document.getElementById('mainContent').style.display = 'none';
+            
+            // Optional: Show logout message
+            alert('Anda telah keluar dari sistem.');
         });
 
         // Page navigation
@@ -599,7 +646,10 @@
             });
             
             // Show selected page
-            document.getElementById(pageName + 'Page').style.display = 'block';
+            const selectedPage = document.getElementById(pageName + 'Page');
+            if (selectedPage) {
+                selectedPage.style.display = 'block';
+            }
             
             // Update active nav link
             const navLinks = document.querySelectorAll('.nav-link');
@@ -623,7 +673,7 @@
         // Add fade-in animation to elements when they come into view
         const observerOptions = {
             threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
+            rootMargin: "0px 0px -50px 0px"
         };
 
         const observer = new IntersectionObserver(function(entries) {
@@ -640,4 +690,5 @@
         });
     </script>
 </body>
+
 </html>
