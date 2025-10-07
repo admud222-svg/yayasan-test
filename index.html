@@ -364,6 +364,10 @@
             border-left: 4px solid var(--accent-red);
         }
 
+        .notification.warning {
+            border-left: 4px solid #ffc107;
+        }
+
         /* Loading Spinner */
         .spinner-container {
             display: flex;
@@ -823,6 +827,7 @@
         
         let supabase;
         let supabaseInitialized = false;
+        let connectionTested = false;
 
         try {
             supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -864,7 +869,13 @@
                 
                 // If posts page is selected and Supabase is initialized, load posts
                 if (pageName === 'posts' && supabaseInitialized) {
-                    loadPosts();
+                    if (!connectionTested) {
+                        testSupabaseConnection().then(() => {
+                            loadPosts();
+                        });
+                    } else {
+                        loadPosts();
+                    }
                 }
                 
                 // Reinitialize animations for the newly shown page
@@ -894,6 +905,7 @@
             console.error(`Error during ${operation}:`, error);
             
             let errorMessage = "An error occurred";
+            let notificationType = "error";
             
             if (error.message) {
                 errorMessage = error.message;
@@ -906,26 +918,58 @@
                 errorMessage = "Network error: Failed to connect to Supabase. Please check your internet connection and Supabase configuration.";
             }
             
-            showNotification(errorMessage, "error");
+            // Cek error khusus untuk tabel tidak ada
+            if (error.code === '42P01' || error.message?.includes('relation "public.posts" does not exist')) {
+                errorMessage = "Tabel 'posts' tidak ditemukan. Silakan buat tabel terlebih dahulu di dashboard Supabase.";
+                notificationType = "warning";
+            }
+            
+            // Cek error khusus untuk policy tidak ada
+            if (error.code === '42501' || error.message?.includes('permission denied')) {
+                errorMessage = "Akses ditolak. Silakan periksa policy untuk tabel dan storage di dashboard Supabase.";
+                notificationType = "warning";
+            }
+            
+            // Cek error khusus untuk bucket tidak ada
+            if (error.message?.includes('The resource was not found')) {
+                errorMessage = "Storage bucket 'posts' tidak ditemukan. Silakan buat bucket terlebih dahulu di dashboard Supabase.";
+                notificationType = "warning";
+            }
+            
+            showNotification(errorMessage, notificationType);
         }
 
         // Fungsi untuk menguji koneksi ke Supabase
         async function testSupabaseConnection() {
+            if (!supabaseInitialized) {
+                showNotification("Supabase tidak terinisialisasi. Silakan periksa konfigurasi Anda.", "error");
+                return false;
+            }
+            
             try {
-                // Coba akses tabel posts untuk memeriksa koneksi
+                // Pertama coba akses auth untuk memastikan koneksi ke Supabase berhasil
+                const { data: { session }, error: authError } = await supabase.auth.getSession();
+                
+                if (authError) {
+                    throw authError;
+                }
+                
+                console.log("Supabase auth connection successful");
+                
+                // Kemudian coba akses tabel posts
                 const { data, error } = await supabase.from('posts').select('count', { count: 'exact', head: true });
                 
                 if (error) {
-                    console.error("Supabase connection test failed:", error);
-                    showNotification("Failed to connect to Supabase. Check your configuration.", "error");
-                    return false;
+                    throw error;
                 }
                 
-                console.log("Supabase connection successful");
+                console.log("Supabase connection and table access successful");
+                connectionTested = true;
                 return true;
             } catch (error) {
                 console.error("Supabase connection test error:", error);
-                showNotification("Failed to connect to Supabase. Check your configuration.", "error");
+                showSupabaseError(error, "connection test");
+                connectionTested = false;
                 return false;
             }
         }
@@ -933,7 +977,9 @@
         // Only proceed if Supabase is initialized
         if (supabaseInitialized) {
             // Uji koneksi saat halaman dimuat
-            testSupabaseConnection();
+            window.addEventListener('load', () => {
+                testSupabaseConnection();
+            });
             
             // Check if user is logged in
             async function checkUser() {
@@ -963,7 +1009,9 @@
                         };
                         
                         // Load posts
-                        loadPosts();
+                        if (connectionTested) {
+                            loadPosts();
+                        }
                     } else {
                         // User is signed out
                         loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i> Masuk';
@@ -974,7 +1022,9 @@
                         };
                         
                         // Load public posts
-                        loadPublicPosts();
+                        if (connectionTested) {
+                            loadPublicPosts();
+                        }
                     }
                 } catch (error) {
                     showSupabaseError(error, "checking user");
@@ -1106,6 +1156,11 @@
 
             // Load Posts (for authenticated users)
             async function loadPosts() {
+                if (!connectionTested) {
+                    const isConnected = await testSupabaseConnection();
+                    if (!isConnected) return;
+                }
+                
                 postsContainer.innerHTML = '<div class="spinner-container"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
                 
                 try {
@@ -1135,6 +1190,11 @@
 
             // Load Public Posts (for non-authenticated users)
             async function loadPublicPosts() {
+                if (!connectionTested) {
+                    const isConnected = await testSupabaseConnection();
+                    if (!isConnected) return;
+                }
+                
                 postsContainer.innerHTML = '<div class="spinner-container"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
                 
                 try {
@@ -1221,7 +1281,7 @@
             
             setTimeout(() => {
                 notification.classList.remove('show');
-            }, 3000);
+            }, 5000);
         }
 
         // Add fade-in animation to elements when they come into view
