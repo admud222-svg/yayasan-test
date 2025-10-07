@@ -68,6 +68,32 @@
             transform: scale(1.1);
         }
 
+        /* Floating Action Button untuk Admin */
+        .admin-fab {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 110px;
+            right: 40px;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border-radius: 50px;
+            text-align: center;
+            font-size: 24px;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .admin-fab:hover {
+            background-color: #FFC107;
+            transform: scale(1.1);
+        }
+
         /* Navbar */
         .navbar {
             background-color: var(--primary-color) !important;
@@ -87,6 +113,7 @@
             margin: 0 10px;
             transition: all 0.3s;
             position: relative;
+            cursor: pointer;
         }
 
         .nav-link:hover {
@@ -216,6 +243,135 @@
             margin-bottom: 20px;
         }
 
+        /* Post Styles */
+        .post-item {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .post-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .post-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .post-content {
+            padding: 25px;
+        }
+
+        .post-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .post-meta {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .post-text {
+            line-height: 1.6;
+        }
+
+        /* Form Styles */
+        .form-control, .form-select {
+            border-radius: 0.35rem;
+            border: 1px solid #d1d3e2;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(44, 140, 60, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 0.35rem;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: #237131;
+            border-color: #237131;
+        }
+
+        /* Login Modal */
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: white;
+            border-radius: 0.35rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1050;
+            display: none;
+            max-width: 350px;
+        }
+
+        .notification.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--accent-red);
+        }
+
+        /* Loading Spinner */
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
         /* Footer */
         footer {
             background-color: var(--primary-color);
@@ -244,12 +400,15 @@
                 font-size: 2rem;
             }
             
-            .whatsapp-float {
+            .whatsapp-float, .admin-fab {
                 width: 50px;
                 height: 50px;
                 font-size: 24px;
                 bottom: 20px;
-                right: 20px;
+            }
+            
+            .admin-fab {
+                bottom: 80px;
             }
         }
 
@@ -317,12 +476,20 @@
         <i class="bi bi-whatsapp"></i>
     </a>
 
+    <!-- Floating Action Button untuk Admin -->
+    <div id="adminFab" class="admin-fab" title="Buat Postingan Baru">
+        <i class="bi bi-plus-lg"></i>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
     <!-- Main Content -->
     <div id="mainContent">
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container">
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand" href="#" onclick="showPage('home')">
                     <img src="https://z-cdn-media.chatglm.cn/files/271463af-2f11-4678-bd4f-68e56a8722ea_WhatsApp%20Image%202025-09-29%20at%2018.09.19_8dd8e276.jpg?auth_key=1790681919-339bcd4fa2a1418dacf4018ccdef01fe-0-3a49bc8c86d0efa3861aa796dd88f3e3" alt="Logo Yasamu" class="logo">
                     Yasamu
                 </a>
@@ -332,13 +499,21 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#" data-page="home">Home</a>
+                            <a class="nav-link active" href="#" onclick="showPage('home')">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="product">Produk Yayasan</a>
+                            <a class="nav-link" href="#" onclick="showPage('product')">Produk Yayasan</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="media">Media</a>
+                            <a class="nav-link" href="#" onclick="showPage('media')">Media</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPage('posts')">Postingan</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <button id="loginBtn" class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Masuk
+                            </button>
                         </li>
                     </ul>
                 </div>
@@ -514,6 +689,26 @@
             </div>
         </div>
 
+        <!-- Posts Page -->
+        <div id="postsPage" class="page-content" style="display: none;">
+            <div class="container my-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="section-title mb-0">Kegiatan Terbaru</h2>
+                    <button id="refreshBtn" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                    </button>
+                </div>
+                
+                <div id="postsContainer">
+                    <div class="spinner-container">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Footer -->
         <footer>
             <div class="container">
@@ -530,10 +725,10 @@
                     <div class="col-md-4 mb-4">
                         <h5 class="footer-title fade-in stagger-1">Tautan Cepat</h5>
                         <ul class="list-unstyled">
-                            <li><a href="#" class="text-white-50 text-decoration-none">Tentang Kami</a></li>
-                            <li><a href="#" class="text-white-50 text-decoration-none">Program</a></li>
-                            <li><a href="#" class="text-white-50 text-decoration-none">Donasi</a></li>
-                            <li><a href="#" class="text-white-50 text-decoration-none">Relawan</a></li>
+                            <li><a href="#" onclick="showPage('home')" class="text-white-50 text-decoration-none">Tentang Kami</a></li>
+                            <li><a href="#" onclick="showPage('product')" class="text-white-50 text-decoration-none">Program</a></li>
+                            <li><a href="#" onclick="showPage('media')" class="text-white-50 text-decoration-none">Donasi</a></li>
+                            <li><a href="#" onclick="showPage('posts')" class="text-white-50 text-decoration-none">Relawan</a></li>
                         </ul>
                     </div>
                     <div class="col-md-4 mb-4">
@@ -554,10 +749,121 @@
         </footer>
     </div>
 
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Masuk ke Akun Admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Masuk</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Post Form Modal -->
+    <div class="modal fade" id="postModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Buat Postingan Baru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="postForm">
+                        <div class="mb-3">
+                            <label for="postTitle" class="form-label">Judul</label>
+                            <input type="text" class="form-control" id="postTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="postContent" class="form-label">Konten</label>
+                            <textarea class="form-control" id="postContent" rows="5" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="postImage" class="form-label">Upload Foto</label>
+                            <input type="file" class="form-control" id="postImage" accept="image/*">
+                            <div id="imagePreview" class="mt-2 text-center"></div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send me-2"></i>Publikasikan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage-compat.js"></script>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // Page navigation
+        // Initialize Firebase dengan konfigurasi yang diberikan
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiWitAlV_kLIVtUFca4EcvpwVng8GQzkE",
+            authDomain: "yayasan-9d268.firebaseapp.com",
+            projectId: "yayasan-9d268",
+            storageBucket: "yayasan-9d268.firebasestorage.app",
+            messagingSenderId: "148531230337",
+            appId: "1:148531230337:web:43e17f8715aa3d8f22bf80",
+            measurementId: "G-PDH2Y48CVS"
+        };
+
+        // Initialize Firebase with error handling
+        let firebaseInitialized = false;
+        let auth, database, storage;
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            database = firebase.database();
+            storage = firebase.storage();
+            firebaseInitialized = true;
+            console.log("Firebase initialized successfully");
+        } catch (error) {
+            console.error("Error initializing Firebase:", error);
+            showNotification("Error initializing Firebase. Please check your configuration.", "error");
+        }
+
+        // DOM Elements
+        const loginBtn = document.getElementById('loginBtn');
+        const adminFab = document.getElementById('adminFab');
+        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        const postModal = new bootstrap.Modal(document.getElementById('postModal'));
+        const loginForm = document.getElementById('loginForm');
+        const postForm = document.getElementById('postForm');
+        const postsContainer = document.getElementById('postsContainer');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const notification = document.getElementById('notification');
+        const postImage = document.getElementById('postImage');
+        const imagePreview = document.getElementById('imagePreview');
+
+        // Page navigation function
         function showPage(pageName) {
+            console.log("Navigating to page:", pageName);
+            
             // Hide all pages
             const pages = document.querySelectorAll('.page-content');
             pages.forEach(page => {
@@ -568,6 +874,16 @@
             const selectedPage = document.getElementById(pageName + 'Page');
             if (selectedPage) {
                 selectedPage.style.display = 'block';
+                console.log("Page displayed:", pageName + 'Page');
+                
+                // If posts page is selected and Firebase is initialized, load posts
+                if (pageName === 'posts' && firebaseInitialized) {
+                    if (auth && auth.currentUser) {
+                        loadPosts();
+                    } else {
+                        loadPublicPosts();
+                    }
+                }
                 
                 // Reinitialize animations for the newly shown page
                 const animatedElements = selectedPage.querySelectorAll('.fade-in, .slide-left, .slide-right, .zoom-in');
@@ -577,26 +893,263 @@
                     el.offsetHeight; // Trigger reflow
                     el.style.animation = null;
                 });
+            } else {
+                console.error("Page not found:", pageName + 'Page');
             }
             
             // Update active nav link
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
                 link.classList.remove('active');
-                if (link.getAttribute('data-page') === pageName) {
+                if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(pageName)) {
                     link.classList.add('active');
                 }
             });
         }
 
-        // Add click event to nav links
-        document.querySelectorAll('.nav-link[data-page]').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const page = this.getAttribute('data-page');
-                showPage(page);
+        // Only proceed if Firebase is initialized
+        if (firebaseInitialized) {
+            // Check if user is logged in
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    loginBtn.innerHTML = '<i class="bi bi-box-arrow-right me-1"></i> Keluar';
+                    adminFab.style.display = 'flex';
+                    
+                    loginBtn.addEventListener('click', () => {
+                        auth.signOut();
+                    });
+                    
+                    adminFab.addEventListener('click', () => {
+                        postModal.show();
+                    });
+                    
+                    // Load posts
+                    loadPosts();
+                } else {
+                    // User is signed out
+                    loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i> Masuk';
+                    adminFab.style.display = 'none';
+                    
+                    loginBtn.addEventListener('click', () => {
+                        loginModal.show();
+                    });
+                    
+                    // Load public posts
+                    loadPublicPosts();
+                }
             });
-        });
+
+            // Login Form
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(() => {
+                        showNotification('Login berhasil!', 'success');
+                        loginModal.hide();
+                        loginForm.reset();
+                    })
+                    .catch(error => {
+                        showNotification(error.message, 'error');
+                    });
+            });
+
+            // Image Preview
+            postImage.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = (e) => {
+                        imagePreview.innerHTML = `<img src="${e.target.result}" class="img-fluid rounded" alt="Preview">`;
+                    };
+                    
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.innerHTML = '';
+                }
+            });
+
+            // Post Form
+            postForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const title = document.getElementById('postTitle').value;
+                const content = document.getElementById('postContent').value;
+                const imageFile = postImage.files[0];
+                
+                const user = auth.currentUser;
+                
+                if (user) {
+                    const post = {
+                        title: title,
+                        content: content,
+                        author: user.email,
+                        timestamp: Date.now(),
+                        date: new Date().toLocaleString('id-ID')
+                    };
+                    
+                    if (imageFile) {
+                        // Upload image to Firebase Storage
+                        const storageRef = storage.ref(`posts/${user.uid}/${Date.now()}_${imageFile.name}`);
+                        const uploadTask = storageRef.put(imageFile);
+                        
+                        uploadTask.on('state_changed', 
+                            (snapshot) => {
+                                // Upload progress
+                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                console.log('Upload is ' + progress + '% done');
+                            }, 
+                            (error) => {
+                                // Handle unsuccessful uploads
+                                showNotification(error.message, 'error');
+                            }, 
+                            () => {
+                                // Handle successful uploads on complete
+                                uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+                                    post.imageUrl = downloadURL;
+                                    savePost(post);
+                                });
+                            }
+                        );
+                    } else {
+                        savePost(post);
+                    }
+                }
+            });
+
+            // Save Post to Database
+            function savePost(post) {
+                database.ref('posts').push(post)
+                    .then(() => {
+                        showNotification('Postingan berhasil dipublikasikan!', 'success');
+                        postModal.hide();
+                        postForm.reset();
+                        imagePreview.innerHTML = '';
+                    })
+                    .catch(error => {
+                        showNotification(error.message, 'error');
+                    });
+            }
+
+            // Load Posts (for authenticated users)
+            function loadPosts() {
+                postsContainer.innerHTML = '<div class="spinner-container"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+                
+                database.ref('posts').orderByChild('timestamp').on('value', snapshot => {
+                    postsContainer.innerHTML = '';
+                    
+                    if (snapshot.exists()) {
+                        const posts = [];
+                        snapshot.forEach(childSnapshot => {
+                            posts.push({
+                                id: childSnapshot.key,
+                                ...childSnapshot.val()
+                            });
+                        });
+                        
+                        // Sort by timestamp (newest first)
+                        posts.sort((a, b) => b.timestamp - a.timestamp);
+                        
+                        posts.forEach(post => {
+                            const postElement = createPostElement(post);
+                            postsContainer.appendChild(postElement);
+                        });
+                    } else {
+                        postsContainer.innerHTML = '<div class="text-center py-5"><p class="text-muted">Belum ada postingan.</p></div>';
+                    }
+                });
+            }
+
+            // Load Public Posts (for non-authenticated users)
+            function loadPublicPosts() {
+                postsContainer.innerHTML = '<div class="spinner-container"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+                
+                database.ref('posts').orderByChild('timestamp').limitToLast(10).on('value', snapshot => {
+                    postsContainer.innerHTML = '';
+                    
+                    if (snapshot.exists()) {
+                        const posts = [];
+                        snapshot.forEach(childSnapshot => {
+                            posts.push({
+                                id: childSnapshot.key,
+                                ...childSnapshot.val()
+                            });
+                        });
+                        
+                        // Sort by timestamp (newest first)
+                        posts.sort((a, b) => b.timestamp - a.timestamp);
+                        
+                        posts.forEach(post => {
+                            const postElement = createPostElement(post);
+                            postsContainer.appendChild(postElement);
+                        });
+                    } else {
+                        postsContainer.innerHTML = '<div class="text-center py-5"><p class="text-muted">Belum ada postingan.</p></div>';
+                    }
+                });
+            }
+
+            // Create Post Element
+            function createPostElement(post) {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post-item';
+                
+                let postImageHtml = '';
+                if (post.imageUrl) {
+                    postImageHtml = `<img src="${post.imageUrl}" alt="${post.title}" class="post-image">`;
+                }
+                
+                postDiv.innerHTML = `
+                    ${postImageHtml}
+                    <div class="post-content">
+                        <h3 class="post-title">${post.title}</h3>
+                        <div class="post-meta">
+                            <i class="bi bi-person-circle me-1"></i> ${post.author} 
+                            <i class="bi bi-clock ms-3 me-1"></i> ${post.date}
+                        </div>
+                        <p class="post-text">${post.content}</p>
+                    </div>
+                `;
+                
+                return postDiv;
+            }
+
+            // Refresh Button
+            refreshBtn.addEventListener('click', () => {
+                if (auth.currentUser) {
+                    loadPosts();
+                } else {
+                    loadPublicPosts();
+                }
+            });
+        } else {
+            // If Firebase is not initialized, show a message in the posts container
+            document.addEventListener('DOMContentLoaded', () => {
+                const postsPage = document.getElementById('postsPage');
+                if (postsPage) {
+                    const postsContainer = postsPage.querySelector('#postsContainer');
+                    if (postsContainer) {
+                        postsContainer.innerHTML = '<div class="text-center py-5"><p class="text-danger">Firebase tidak terinisialisasi. Silakan periksa konfigurasi Anda.</p></div>';
+                    }
+                }
+            });
+        }
+
+        // Show Notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
 
         // Add fade-in animation to elements when they come into view
         const observerOptions = {
@@ -613,8 +1166,10 @@
         }, observerOptions);
 
         // Observe all elements with fade-in class
-        document.querySelectorAll('.custom-card, .media-container').forEach(el => {
-            observer.observe(el);
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.custom-card, .media-container').forEach(el => {
+                observer.observe(el);
+            });
         });
     </script>
 </body>
