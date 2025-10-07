@@ -364,8 +364,8 @@
             border-left: 4px solid var(--accent-red);
         }
 
-        .notification.warning {
-            border-left: 4px solid #ffc107;
+        .notification.info {
+            border-left: 4px solid #17a2b8;
         }
 
         /* Loading Spinner */
@@ -374,6 +374,12 @@
             justify-content: center;
             align-items: center;
             height: 200px;
+        }
+
+        /* Progress bar for upload */
+        .progress {
+            height: 5px;
+            margin-top: 10px;
         }
 
         /* Footer */
@@ -802,6 +808,9 @@
                             <label for="postImage" class="form-label">Upload Foto</label>
                             <input type="file" class="form-control" id="postImage" accept="image/*">
                             <div id="imagePreview" class="mt-2 text-center"></div>
+                            <div id="uploadProgress" class="progress d-none">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">
@@ -814,494 +823,433 @@
         </div>
     </div>
 
-    <!-- Tambahkan SDK Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage-compat.js"></script>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-      // Konfigurasi kamu
-      const supabaseUrl = "https://kpoabzksxyechqassrre.supabase.co";
-      const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtwb2FiemtzeHllY2hxYXNyc3JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTM4MjgsImV4cCI6MjA3NTQyOTgyOH0.jYL8bKeGbybbIyS0Lfjq8MQdZJHiRQ4IfCwcKif4-44";
-      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // Initialize Firebase dengan konfigurasi yang diberikan
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiWitAlV_kLIVtUFca4EcvpwVng8GQzkE",
+            authDomain: "yayasan-9d268.firebaseapp.com",
+            projectId: "yayasan-9d268",
+            storageBucket: "yayasan-9d268.firebasestorage.app",
+            messagingSenderId: "148531230337",
+            appId: "1:148531230337:web:43e17f8715aa3d8f22bf80",
+            measurementId: "G-PDH2Y48CVS"
+        };
 
-      console.log("Supabase connected ✅", supabase);
-      
-      let connectionTested = false;
-      let currentUser = null;
+        // Initialize Firebase with error handling
+        let firebaseInitialized = false;
+        let auth, database, storage;
 
-      // Tes koneksi
-      async function testSupabase() {
         try {
-          const { data, error } = await supabase.from("posts").select("*");
-          if (error) {
-            console.error("❌ Gagal konek:", error.message);
-            showNotification("Gagal terhubung ke Supabase: " + error.message, "error");
-            return false;
-          } else {
-            console.log("✅ Koneksi berhasil!", data);
-            connectionTested = true;
-            return true;
-          }
-        } catch (err) {
-          console.error("❌ Error saat tes koneksi:", err);
-          showNotification("Error saat tes koneksi: " + err.message, "error");
-          return false;
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            database = firebase.database();
+            storage = firebase.storage();
+            firebaseInitialized = true;
+            console.log("Firebase initialized successfully");
+        } catch (error) {
+            console.error("Error initializing Firebase:", error);
+            showNotification("Error initializing Firebase. Please check your configuration.", "error");
         }
-      }
 
-      // DOM Elements
-      const loginBtn = document.getElementById('loginBtn');
-      const adminFab = document.getElementById('adminFab');
-      const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-      const postModal = new bootstrap.Modal(document.getElementById('postModal'));
-      const loginForm = document.getElementById('loginForm');
-      const postForm = document.getElementById('postForm');
-      const postsContainer = document.getElementById('postsContainer');
-      const refreshBtn = document.getElementById('refreshBtn');
-      const notification = document.getElementById('notification');
-      const postImage = document.getElementById('postImage');
-      const imagePreview = document.getElementById('imagePreview');
+        // DOM Elements
+        const loginBtn = document.getElementById('loginBtn');
+        const adminFab = document.getElementById('adminFab');
+        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        const postModal = new bootstrap.Modal(document.getElementById('postModal'));
+        const loginForm = document.getElementById('loginForm');
+        const postForm = document.getElementById('postForm');
+        const postsContainer = document.getElementById('postsContainer');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const notification = document.getElementById('notification');
+        const postImage = document.getElementById('postImage');
+        const imagePreview = document.getElementById('imagePreview');
+        const uploadProgress = document.getElementById('uploadProgress');
 
-      // Page navigation function
-      function showPage(pageName) {
-        console.log("Navigating to page:", pageName);
-        
-        // Hide all pages
-        const pages = document.querySelectorAll('.page-content');
-        pages.forEach(page => {
-          page.style.display = 'none';
-        });
-        
-        // Show selected page
-        const selectedPage = document.getElementById(pageName + 'Page');
-        if (selectedPage) {
-          selectedPage.style.display = 'block';
-          console.log("Page displayed:", pageName + 'Page');
-          
-          // If posts page is selected, load posts
-          if (pageName === 'posts') {
-            if (!connectionTested) {
-              testSupabase().then(() => {
-                loadPosts();
-              });
+        // Page navigation function
+        function showPage(pageName) {
+            console.log("Navigating to page:", pageName);
+            
+            // Hide all pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Show selected page
+            const selectedPage = document.getElementById(pageName + 'Page');
+            if (selectedPage) {
+                selectedPage.style.display = 'block';
+                console.log("Page displayed:", pageName + 'Page');
+                
+                // If posts page is selected and Firebase is initialized, load posts
+                if (pageName === 'posts' && firebaseInitialized) {
+                    if (auth && auth.currentUser) {
+                        loadPosts();
+                    } else {
+                        loadPublicPosts();
+                    }
+                }
+                
+                // Reinitialize animations for the newly shown page
+                const animatedElements = selectedPage.querySelectorAll('.fade-in, .slide-left, .slide-right, .zoom-in');
+                animatedElements.forEach(el => {
+                    // Reset animation
+                    el.style.animation = 'none';
+                    el.offsetHeight; // Trigger reflow
+                    el.style.animation = null;
+                });
             } else {
-              loadPosts();
-            }
-          }
-          
-          // Reinitialize animations for the newly shown page
-          const animatedElements = selectedPage.querySelectorAll('.fade-in, .slide-left, .slide-right, .zoom-in');
-          animatedElements.forEach(el => {
-            // Reset animation
-            el.style.animation = 'none';
-            el.offsetHeight; // Trigger reflow
-            el.style.animation = null;
-          });
-        } else {
-          console.error("Page not found:", pageName + 'Page');
-        }
-        
-        // Update active nav link
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-          link.classList.remove('active');
-          if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(pageName)) {
-            link.classList.add('active');
-          }
-        });
-      }
-
-      // Fungsi untuk menampilkan notifikasi error yang lebih detail
-      function showSupabaseError(error, operation) {
-        console.error(`Error during ${operation}:`, error);
-        
-        let errorMessage = "An error occurred";
-        let notificationType = "error";
-        
-        if (error.message) {
-          errorMessage = error.message;
-        } else if (typeof error === 'string') {
-          errorMessage = error;
-        }
-        
-        // Tambahkan informasi tambahan untuk error fetch
-        if (error instanceof TypeError && error.message === 'Failed to fetch') {
-          errorMessage = "Network error: Failed to connect to Supabase. Please check your internet connection and Supabase configuration.";
-        }
-        
-        // Cek error khusus untuk auth session missing
-        if (error.message?.includes('Auth session missing!')) {
-          errorMessage = "Sesi autentikasi tidak ditemukan. Silakan login kembali.";
-          notificationType = "warning";
-          // Reset UI state
-          updateUIForLoggedOutUser();
-          return;
-        }
-        
-        // Cek error khusus untuk tabel tidak ada
-        if (error.code === '42P01' || error.message?.includes('relation "public.posts" does not exist')) {
-          errorMessage = "Tabel 'posts' tidak ditemukan. Silakan buat tabel terlebih dahulu di dashboard Supabase.";
-          notificationType = "warning";
-        }
-        
-        // Cek error khusus untuk policy tidak ada
-        if (error.code === '42501' || error.message?.includes('permission denied')) {
-          errorMessage = "Akses ditolak. Silakan periksa policy untuk tabel dan storage di dashboard Supabase.";
-          notificationType = "warning";
-        }
-        
-        // Cek error khusus untuk bucket tidak ada
-        if (error.message?.includes('The resource was not found')) {
-          errorMessage = "Storage bucket 'posts' tidak ditemukan. Silakan buat bucket terlebih dahulu di dashboard Supabase.";
-          notificationType = "warning";
-        }
-        
-        showNotification(errorMessage, notificationType);
-      }
-
-      // Fungsi untuk memperbarui UI untuk pengguna yang sudah login
-      function updateUIForLoggedInUser(user) {
-        currentUser = user;
-        loginBtn.innerHTML = '<i class="bi bi-box-arrow-right me-1"></i> Keluar';
-        adminFab.style.display = 'flex';
-        
-        loginBtn.onclick = async () => {
-          try {
-            const { error } = await supabase.auth.signOut();
-            if (error) throw error;
-          } catch (error) {
-            showSupabaseError(error, "sign out");
-          }
-        };
-        
-        adminFab.onclick = () => {
-          postModal.show();
-        };
-      }
-
-      // Fungsi untuk memperbarui UI untuk pengguna yang belum login
-      function updateUIForLoggedOutUser() {
-        currentUser = null;
-        loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i> Masuk';
-        adminFab.style.display = 'none';
-        
-        loginBtn.onclick = () => {
-          loginModal.show();
-        };
-      }
-
-      // Fungsi untuk mengecek status login pengguna
-      async function checkUser() {
-        try {
-          // Gunakan getSession() untuk mengecek sesi dengan lebih aman
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-          
-          if (sessionError) {
-            throw sessionError;
-          }
-          
-          if (session && session.user) {
-            updateUIForLoggedInUser(session.user);
-            
-            // Load posts if on posts page
-            if (document.getElementById('postsPage').style.display !== 'none' && connectionTested) {
-              loadPosts();
-            }
-          } else {
-            updateUIForLoggedOutUser();
-            
-            // Load public posts if on posts page
-            if (document.getElementById('postsPage').style.display !== 'none' && connectionTested) {
-              loadPublicPosts();
-            }
-          }
-        } catch (error) {
-          console.error("Error checking user session:", error);
-          showSupabaseError(error, "checking user");
-          updateUIForLoggedOutUser();
-        }
-      }
-
-      // Uji koneksi saat halaman dimuat
-      window.addEventListener('load', async () => {
-        await testSupabase();
-        await checkUser();
-      });
-      
-      // Listen for auth state changes
-      supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log("Auth state changed:", event, session);
-        
-        if (event === 'SIGNED_IN' && session) {
-          updateUIForLoggedInUser(session.user);
-          showNotification('Login berhasil!', 'success');
-          
-          // Load posts if on posts page
-          if (document.getElementById('postsPage').style.display !== 'none' && connectionTested) {
-            loadPosts();
-          }
-        } else if (event === 'SIGNED_OUT') {
-          updateUIForLoggedOutUser();
-          showNotification('Anda telah keluar', 'success');
-          
-          // Load public posts if on posts page
-          if (document.getElementById('postsPage').style.display !== 'none' && connectionTested) {
-            loadPublicPosts();
-          }
-        }
-      });
-
-      // Login Form
-      loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        try {
-          const { data, error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password
-          });
-          
-          if (error) {
-            throw error;
-          }
-          
-          loginModal.hide();
-          loginForm.reset();
-        } catch (error) {
-          showSupabaseError(error, "login");
-        }
-      });
-
-      // Image Preview
-      postImage.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        
-        if (file) {
-          const reader = new FileReader();
-          
-          reader.onload = (e) => {
-            imagePreview.innerHTML = `<img src="${e.target.result}" class="img-fluid rounded" alt="Preview">`;
-          };
-          
-          reader.readAsDataURL(file);
-        } else {
-          imagePreview.innerHTML = '';
-        }
-      });
-
-      // Post Form
-      postForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const title = document.getElementById('postTitle').value;
-        const content = document.getElementById('postContent').value;
-        const imageFile = postImage.files[0];
-        
-        try {
-          // Cek lagi status user sebelum submit
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-          
-          if (sessionError) {
-            throw sessionError;
-          }
-          
-          if (!session || !session.user) {
-            showNotification("Anda harus login untuk membuat postingan", "error");
-            return;
-          }
-          
-          const user = session.user;
-          let imageUrl = null;
-          
-          if (imageFile) {
-            // Upload image to Supabase Storage
-            const fileName = `${user.id}/${Date.now()}_${imageFile.name}`;
-            const { data: uploadData, error: uploadError } = await supabase.storage
-              .from('posts')
-              .upload(fileName, imageFile);
-            
-            if (uploadError) {
-              throw uploadError;
+                console.error("Page not found:", pageName + 'Page');
             }
             
-            // Get public URL
-            const { data: { publicUrl } } = supabase.storage
-              .from('posts')
-              .getPublicUrl(fileName);
-            
-            imageUrl = publicUrl;
-          }
-          
-          // Save post to database
-          const { data, error } = await supabase
-            .from('posts')
-            .insert([
-              {
-                title: title,
-                content: content,
-                author: user.email,
-                image_url: imageUrl,
-                created_at: new Date().toISOString()
-              }
-            ]);
-          
-          if (error) {
-            throw error;
-          }
-          
-          showNotification('Postingan berhasil dipublikasikan!', 'success');
-          postModal.hide();
-          postForm.reset();
-          imagePreview.innerHTML = '';
-          loadPosts();
-        } catch (error) {
-          showSupabaseError(error, "creating post");
-        }
-      });
-
-      // Load Posts (for authenticated users)
-      async function loadPosts() {
-        if (!connectionTested) {
-          const isConnected = await testSupabase();
-          if (!isConnected) return;
-        }
-        
-        postsContainer.innerHTML = '<div class="spinner-container"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
-        
-        try {
-          const { data, error } = await supabase
-            .from('posts')
-            .select('*')
-            .order('created_at', { ascending: false });
-          
-          if (error) {
-            throw error;
-          }
-          
-          if (data && data.length > 0) {
-            postsContainer.innerHTML = '';
-            data.forEach(post => {
-              const postElement = createPostElement(post);
-              postsContainer.appendChild(postElement);
+            // Update active nav link
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(pageName)) {
+                    link.classList.add('active');
+                }
             });
-          } else {
-            postsContainer.innerHTML = '<div class="text-center py-5"><p class="text-muted">Belum ada postingan.</p></div>';
-          }
-        } catch (error) {
-          showSupabaseError(error, "loading posts");
-          postsContainer.innerHTML = '<div class="text-center py-5"><p class="text-danger">Error loading posts. Please try again later.</p></div>';
         }
-      }
 
-      // Load Public Posts (for non-authenticated users)
-      async function loadPublicPosts() {
-        if (!connectionTested) {
-          const isConnected = await testSupabase();
-          if (!isConnected) return;
-        }
-        
-        postsContainer.innerHTML = '<div class="spinner-container"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
-        
-        try {
-          const { data, error } = await supabase
-            .from('posts')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(10);
-          
-          if (error) {
-            throw error;
-          }
-          
-          if (data && data.length > 0) {
-            postsContainer.innerHTML = '';
-            data.forEach(post => {
-              const postElement = createPostElement(post);
-              postsContainer.appendChild(postElement);
+        // Only proceed if Firebase is initialized
+        if (firebaseInitialized) {
+            // Check if user is logged in
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    console.log("User is logged in:", user.email);
+                    loginBtn.innerHTML = '<i class="bi bi-box-arrow-right me-1"></i> Keluar';
+                    adminFab.style.display = 'flex';
+                    
+                    loginBtn.addEventListener('click', () => {
+                        auth.signOut().then(() => {
+                            showNotification('Anda telah keluar', 'info');
+                        }).catch(error => {
+                            console.error("Sign out error:", error);
+                        });
+                    });
+                    
+                    adminFab.addEventListener('click', () => {
+                        postModal.show();
+                    });
+                    
+                    // Load posts
+                    loadPosts();
+                } else {
+                    // User is signed out
+                    console.log("User is not logged in");
+                    loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i> Masuk';
+                    adminFab.style.display = 'none';
+                    
+                    loginBtn.addEventListener('click', () => {
+                        loginModal.show();
+                    });
+                    
+                    // Load public posts
+                    loadPublicPosts();
+                }
             });
-          } else {
-            postsContainer.innerHTML = '<div class="text-center py-5"><p class="text-muted">Belum ada postingan.</p></div>';
-          }
-        } catch (error) {
-          showSupabaseError(error, "loading public posts");
-          postsContainer.innerHTML = '<div class="text-center py-5"><p class="text-danger">Error loading posts. Please try again later.</p></div>';
-        }
-      }
 
-      // Create Post Element
-      function createPostElement(post) {
-        const postDiv = document.createElement('div');
-        postDiv.className = 'post-item';
-        
-        let postImageHtml = '';
-        if (post.image_url) {
-          postImageHtml = `<img src="${post.image_url}" alt="${post.title}" class="post-image">`;
-        }
-        
-        // Format date
-        const date = new Date(post.created_at);
-        const formattedDate = date.toLocaleString('id-ID');
-        
-        postDiv.innerHTML = `
-          ${postImageHtml}
-          <div class="post-content">
-            <h3 class="post-title">${post.title}</h3>
-            <div class="post-meta">
-              <i class="bi bi-person-circle me-1"></i> ${post.author} 
-              <i class="bi bi-clock ms-3 me-1"></i> ${formattedDate}
-            </div>
-            <p class="post-text">${post.content}</p>
-          </div>
-        `;
-        
-        return postDiv;
-      }
+            // Login Form
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                console.log("Attempting login with email:", email);
+                
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        console.log("Login successful:", userCredential.user);
+                        showNotification('Login berhasil!', 'success');
+                        loginModal.hide();
+                        loginForm.reset();
+                    })
+                    .catch(error => {
+                        console.error("Login error:", error);
+                        showNotification('Login gagal: ' + error.message, 'error');
+                    });
+            });
 
-      // Refresh Button
-      refreshBtn.addEventListener('click', async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session && session.user) {
-          loadPosts();
+            // Image Preview
+            postImage.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = (e) => {
+                        imagePreview.innerHTML = `<img src="${e.target.result}" class="img-fluid rounded" alt="Preview">`;
+                    };
+                    
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.innerHTML = '';
+                }
+            });
+
+            // Post Form
+            postForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const title = document.getElementById('postTitle').value;
+                const content = document.getElementById('postContent').value;
+                const imageFile = postImage.files[0];
+                
+                const user = auth.currentUser;
+                
+                if (!user) {
+                    showNotification('Anda harus login untuk membuat postingan', 'error');
+                    return;
+                }
+                
+                console.log("Creating post with title:", title);
+                
+                const post = {
+                    title: title,
+                    content: content,
+                    author: user.email,
+                    authorId: user.uid,
+                    timestamp: Date.now(),
+                    date: new Date().toLocaleString('id-ID')
+                };
+                
+                if (imageFile) {
+                    // Show progress bar
+                    uploadProgress.classList.remove('d-none');
+                    
+                    // Upload image to Firebase Storage
+                    const storageRef = storage.ref(`posts/${user.uid}/${Date.now()}_${imageFile.name}`);
+                    const uploadTask = storageRef.put(imageFile);
+                    
+                    uploadTask.on('state_changed', 
+                        (snapshot) => {
+                            // Upload progress
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            console.log('Upload is ' + progress + '% done');
+                            uploadProgress.querySelector('.progress-bar').style.width = progress + '%';
+                        }, 
+                        (error) => {
+                            // Handle unsuccessful uploads
+                            console.error("Upload error:", error);
+                            uploadProgress.classList.add('d-none');
+                            showNotification('Gagal mengupload gambar: ' + error.message, 'error');
+                        }, 
+                        () => {
+                            // Handle successful uploads on complete
+                            uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+                                post.imageUrl = downloadURL;
+                                savePost(post);
+                                uploadProgress.classList.add('d-none');
+                            });
+                        }
+                    );
+                } else {
+                    savePost(post);
+                }
+            });
+
+            // Save Post to Database
+            function savePost(post) {
+                console.log("Saving post to database:", post);
+                
+                database.ref('posts').push(post)
+                    .then(() => {
+                        console.log("Post saved successfully");
+                        showNotification('Postingan berhasil dipublikasikan!', 'success');
+                        postModal.hide();
+                        postForm.reset();
+                        imagePreview.innerHTML = '';
+                    })
+                    .catch(error => {
+                        console.error("Error saving post:", error);
+                        showNotification('Gagal menyimpan postingan: ' + error.message, 'error');
+                    });
+            }
+
+            // Load Posts (for authenticated users)
+            function loadPosts() {
+                console.log("Loading posts for authenticated user");
+                postsContainer.innerHTML = '<div class="spinner-container"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+                
+                database.ref('posts').orderByChild('timestamp').on('value', snapshot => {
+                    postsContainer.innerHTML = '';
+                    
+                    if (snapshot.exists()) {
+                        const posts = [];
+                        snapshot.forEach(childSnapshot => {
+                            posts.push({
+                                id: childSnapshot.key,
+                                ...childSnapshot.val()
+                            });
+                        });
+                        
+                        // Sort by timestamp (newest first)
+                        posts.sort((a, b) => b.timestamp - a.timestamp);
+                        
+                        console.log("Loaded", posts.length, "posts");
+                        
+                        posts.forEach(post => {
+                            const postElement = createPostElement(post);
+                            postsContainer.appendChild(postElement);
+                        });
+                    } else {
+                        console.log("No posts found");
+                        postsContainer.innerHTML = '<div class="text-center py-5"><p class="text-muted">Belum ada postingan.</p></div>';
+                    }
+                }, error => {
+                    console.error("Error loading posts:", error);
+                    postsContainer.innerHTML = '<div class="text-center py-5"><p class="text-danger">Gagal memuat postingan. Silakan coba lagi.</p></div>';
+                });
+            }
+
+            // Load Public Posts (for non-authenticated users)
+            function loadPublicPosts() {
+                console.log("Loading public posts");
+                postsContainer.innerHTML = '<div class="spinner-container"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+                
+                database.ref('posts').orderByChild('timestamp').limitToLast(10).on('value', snapshot => {
+                    postsContainer.innerHTML = '';
+                    
+                    if (snapshot.exists()) {
+                        const posts = [];
+                        snapshot.forEach(childSnapshot => {
+                            posts.push({
+                                id: childSnapshot.key,
+                                ...childSnapshot.val()
+                            });
+                        });
+                        
+                        // Sort by timestamp (newest first)
+                        posts.sort((a, b) => b.timestamp - a.timestamp);
+                        
+                        console.log("Loaded", posts.length, "public posts");
+                        
+                        posts.forEach(post => {
+                            const postElement = createPostElement(post);
+                            postsContainer.appendChild(postElement);
+                        });
+                    } else {
+                        console.log("No public posts found");
+                        postsContainer.innerHTML = '<div class="text-center py-5"><p class="text-muted">Belum ada postingan.</p></div>';
+                    }
+                }, error => {
+                    console.error("Error loading public posts:", error);
+                    postsContainer.innerHTML = '<div class="text-center py-5"><p class="text-danger">Gagal memuat postingan. Silakan coba lagi.</p></div>';
+                });
+            }
+
+            // Create Post Element
+            function createPostElement(post) {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post-item';
+                
+                let postImageHtml = '';
+                if (post.imageUrl) {
+                    postImageHtml = `<img src="${post.imageUrl}" alt="${post.title}" class="post-image">`;
+                }
+                
+                postDiv.innerHTML = `
+                    ${postImageHtml}
+                    <div class="post-content">
+                        <h3 class="post-title">${post.title}</h3>
+                        <div class="post-meta">
+                            <i class="bi bi-person-circle me-1"></i> ${post.author} 
+                            <i class="bi bi-clock ms-3 me-1"></i> ${post.date}
+                        </div>
+                        <p class="post-text">${post.content}</p>
+                    </div>
+                `;
+                
+                return postDiv;
+            }
+
+            // Refresh Button
+            refreshBtn.addEventListener('click', () => {
+                console.log("Refresh button clicked");
+                if (auth.currentUser) {
+                    loadPosts();
+                } else {
+                    loadPublicPosts();
+                }
+            });
         } else {
-          loadPublicPosts();
+            // If Firebase is not initialized, show a message in the posts container
+            console.error("Firebase not initialized");
+            document.addEventListener('DOMContentLoaded', () => {
+                const postsPage = document.getElementById('postsPage');
+                if (postsPage) {
+                    const postsContainer = postsPage.querySelector('#postsContainer');
+                    if (postsContainer) {
+                        postsContainer.innerHTML = '<div class="text-center py-5"><p class="text-danger">Firebase tidak terinisialisasi. Silakan periksa konfigurasi Anda.</p></div>';
+                    }
+                }
+            });
         }
-      });
 
-      // Show Notification
-      function showNotification(message, type) {
-        notification.textContent = message;
-        notification.className = `notification ${type} show`;
-        
-        setTimeout(() => {
-          notification.classList.remove('show');
-        }, 5000);
-      }
+        // Show Notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
 
-      // Add fade-in animation to elements when they come into view
-      const observerOptions = {
-        threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px"
-      };
+        // Add fade-in animation to elements when they come into view
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
 
-      const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('fade-in');
-          }
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all elements with fade-in class
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.custom-card, .media-container').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Check if user is already logged in
+            if (firebaseInitialized && auth) {
+                const user = auth.currentUser;
+                if (user) {
+                    console.log("User already logged in:", user.email);
+                    loginBtn.innerHTML = '<i class="bi bi-box-arrow-right me-1"></i> Keluar';
+                    adminFab.style.display = 'flex';
+                    
+                    loginBtn.addEventListener('click', () => {
+                        auth.signOut().then(() => {
+                            showNotification('Anda telah keluar', 'info');
+                        }).catch(error => {
+                            console.error("Sign out error:", error);
+                        });
+                    });
+                    
+                    adminFab.addEventListener('click', () => {
+                        postModal.show();
+                    });
+                }
+            }
         });
-      }, observerOptions);
-
-      // Observe all elements with fade-in class
-      document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.custom-card, .media-container').forEach(el => {
-          observer.observe(el);
-        });
-      });
     </script>
 </body>
 </html>
